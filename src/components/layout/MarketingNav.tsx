@@ -22,7 +22,7 @@ export function MarketingNav() {
 
   return (
     <header
-      className="sticky top-0 z-50 shrink-0 border-b bg-white pt-safe"
+      className="motion-enter sticky top-0 z-50 shrink-0 border-b bg-white pt-safe"
       style={{ borderColor: "var(--border)" }}
     >
       <div className="page-container flex h-12 items-center justify-between sm:h-[45px]">
@@ -61,7 +61,7 @@ export function MarketingNav() {
 
       {open && (
         <nav
-          className="border-t sm:hidden"
+          className="motion-menu-enter border-t sm:hidden"
           style={{ borderColor: "var(--border)", background: "var(--bg-secondary)" }}
         >
           <ul className="page-container space-y-1 py-3">

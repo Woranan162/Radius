@@ -1,7 +1,9 @@
 import { layoutForService } from "@/lib/graph-layout";
+import type { GraphSource } from "@/lib/store/graph-store";
 import type { ArchitectureGraph } from "@/lib/simulation/types";
 
 export type GraphResponse = {
+  source?: GraphSource;
   nodes: {
     id: string;
     name: string;

@@ -3,10 +3,14 @@ import type { ReactNode } from "react";
 import type { SimulationResult } from "@/lib/simulation/types";
 import type { SpofRankingEntry } from "@/lib/simulation/types";
 import type { ArchitectureGraph } from "@/lib/simulation/types";
+import type { GraphSource } from "@/lib/store/graph-store";
+import { DataSourceBadge } from "@/components/graph/DataSourceBadge";
+import { AnimateIn } from "@/components/ui/AnimateIn";
 
 type Props = {
   failId: string;
   graph: ArchitectureGraph;
+  dataSource: GraphSource;
   simulation: SimulationResult;
   spofRankings: SpofRankingEntry[];
   serviceNames: Record<string, string>;
@@ -15,6 +19,7 @@ type Props = {
 export function DemoPageView({
   failId,
   graph,
+  dataSource,
   simulation,
   spofRankings,
   serviceNames,
@@ -24,22 +29,25 @@ export function DemoPageView({
 
   return (
     <main className="page-container py-8 pb-14 sm:py-12 sm:pb-16">
-      {/* Header */}
+      <AnimateIn>
       <header className="mb-8 sm:mb-10">
-        <p
-          className="mb-3 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium"
-          style={{
-            borderColor: "var(--border-strong)",
-            color: "var(--fg-muted)",
-            background: "rgba(255,255,255,0.8)",
-          }}
-        >
-          <span
-            className="h-1.5 w-1.5 rounded-full"
-            style={{ background: "var(--danger)" }}
-          />
-          Live simulation
-        </p>
+        <div className="mb-3 flex flex-wrap items-center gap-2">
+          <DataSourceBadge source={dataSource} />
+          <p
+            className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium"
+            style={{
+              borderColor: "var(--border-strong)",
+              color: "var(--fg-muted)",
+              background: "rgba(255,255,255,0.8)",
+            }}
+          >
+            <span
+              className="h-1.5 w-1.5 rounded-full"
+              style={{ background: "var(--danger)" }}
+            />
+            Live simulation
+          </p>
+        </div>
         <h1
           className="max-w-2xl text-[26px] font-bold leading-tight tracking-tight sm:text-[34px]"
           style={{ color: "var(--fg)" }}
@@ -52,11 +60,13 @@ export function DemoPageView({
           style={{ color: "var(--fg-muted)" }}
         >
           Pick any service below to see blast radius, weighted impact, recovery
-          waves, and SPOF ranking — no database required.
+          waves, and SPOF ranking — loaded from{" "}
+          {dataSource === "aurora" ? "Aurora PostgreSQL" : "sample fallback"}.
         </p>
       </header>
+      </AnimateIn>
 
-      {/* Scenario picker */}
+      <AnimateIn delay={80}>
       <section
         className="mb-8 rounded-xl border p-4 sm:mb-10 sm:p-5"
         style={{ borderColor: "var(--border)", background: "var(--bg-secondary)" }}
@@ -88,8 +98,9 @@ export function DemoPageView({
           })}
         </div>
       </section>
+      </AnimateIn>
 
-      {/* Impact summary row */}
+      <AnimateIn delay={120}>
       <div className="mb-8 grid gap-3 sm:mb-10 sm:grid-cols-2 lg:grid-cols-4">
         <ImpactCard impactPct={impact.impactPct} />
         <StatCard
@@ -108,8 +119,9 @@ export function DemoPageView({
           sub="estimated spend"
         />
       </div>
+      </AnimateIn>
 
-      {/* Detail panels */}
+      <AnimateIn delay={160}>
       <div className="mb-8 grid gap-4 sm:mb-10 lg:grid-cols-2 lg:gap-6">
         <Panel title="Affected services" count={blast.affectedIds.length}>
           <ul className="divide-y" style={{ borderColor: "var(--border)" }}>
@@ -181,8 +193,9 @@ export function DemoPageView({
           </ol>
         </Panel>
       </div>
+      </AnimateIn>
 
-      {/* SPOF ranking */}
+      <AnimateIn delay={200}>
       <Panel title="SPOF ranking" count={spofRankings.length} className="mb-8 sm:mb-10">
         <ul className="space-y-3">
           {spofRankings.map((row) => {
@@ -235,10 +248,11 @@ export function DemoPageView({
           })}
         </ul>
       </Panel>
+      </AnimateIn>
 
-      {/* CTA */}
+      <AnimateIn delay={240}>
       <section
-        className="flex flex-col items-start justify-between gap-4 rounded-xl border p-5 sm:flex-row sm:items-center sm:p-6"
+        className="motion-hover-lift flex flex-col items-start justify-between gap-4 rounded-xl border p-5 sm:flex-row sm:items-center sm:p-6"
         style={{
           borderColor: "var(--border-strong)",
           background:
@@ -258,6 +272,7 @@ export function DemoPageView({
           <ArrowIcon />
         </Link>
       </section>
+      </AnimateIn>
     </main>
   );
 }

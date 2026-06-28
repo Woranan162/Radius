@@ -4,8 +4,6 @@
 
 Model service dependencies on an interactive graph, simulate outages, measure weighted blast radius, plan recovery waves, and rank single points of failure (SPOF).
 
-Built for the [H0 Hackathon](https://h01.devpost.com/) — **Track 2: Monetizable B2B** · Deadline **June 29, 2026**
-
 ---
 
 ## What it does
@@ -30,7 +28,7 @@ Built for the [H0 Hackathon](https://h01.devpost.com/) — **Track 2: Monetizabl
 | Backend | Next.js App Router API routes |
 | Database | PostgreSQL 16 (Docker locally → Aurora in production) |
 | ORM | Prisma 6 |
-| Hosting | Vercel (required by hackathon) |
+| Hosting | Vercel |
 
 ---
 

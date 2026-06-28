@@ -1,3 +1,5 @@
+import { AnimateIn } from "@/components/ui/AnimateIn";
+
 const steps = [
   {
     step: 1,
@@ -28,12 +30,14 @@ const steps = [
 export function HowItWorks() {
   return (
     <section className="mb-14 sm:mb-20">
-      <h2
-        className="mb-10 px-2 text-center text-[24px] font-bold leading-tight tracking-tight sm:mb-14 sm:text-[28px] md:text-[32px]"
-        style={{ color: "var(--fg)" }}
-      >
-        Map dependencies. Radius does the rest.
-      </h2>
+      <AnimateIn>
+        <h2
+          className="mb-10 px-2 text-center text-[24px] font-bold leading-tight tracking-tight sm:mb-14 sm:text-[28px] md:text-[32px]"
+          style={{ color: "var(--fg)" }}
+        >
+          Map dependencies. Radius does the rest.
+        </h2>
+      </AnimateIn>
 
       <div
         className="relative border-t border-dashed pt-10 sm:pt-12"
@@ -41,9 +45,9 @@ export function HowItWorks() {
       >
         <div className="grid gap-8 sm:grid-cols-2 sm:gap-10 lg:grid-cols-4 lg:gap-0">
           {steps.map((item, index) => (
+            <AnimateIn key={item.step} delay={index * 90} className="h-full">
             <div
-              key={item.step}
-              className="relative rounded-lg border px-4 pb-6 pt-10 sm:rounded-none sm:border-0 sm:px-6 sm:pb-0 sm:pt-12 lg:border-l lg:px-8 first:lg:border-l-0"
+              className="motion-hover-lift relative h-full rounded-lg border px-4 pb-6 pt-10 sm:rounded-none sm:border-0 sm:px-6 sm:pb-0 sm:pt-12 lg:border-l lg:px-8 first:lg:border-l-0"
               style={{ borderColor: "var(--border)" }}
             >
               <div className="absolute left-4 top-0 -translate-y-1/2 sm:left-6 lg:left-8">
@@ -73,6 +77,7 @@ export function HowItWorks() {
                 <item.Illustration />
               </div>
             </div>
+            </AnimateIn>
           ))}
         </div>
       </div>

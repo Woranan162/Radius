@@ -6,20 +6,31 @@ import type {
   ServiceTier,
 } from "@/lib/simulation/types";
 
-const CACHE_TTL_MS = 15_000;
-let graphCache: { graph: ArchitectureGraph; at: number } | null = null;
+export type GraphSource = "aurora" | "sample";
 
-function readCache(): ArchitectureGraph | null {
+export type GraphLoadResult = {
+  graph: ArchitectureGraph;
+  source: GraphSource;
+};
+
+const CACHE_TTL_MS = 15_000;
+let graphCache: {
+  graph: ArchitectureGraph;
+  source: GraphSource;
+  at: number;
+} | null = null;
+
+function readCache(): GraphLoadResult | null {
   if (!graphCache) return null;
   if (Date.now() - graphCache.at > CACHE_TTL_MS) {
     graphCache = null;
     return null;
   }
-  return graphCache.graph;
+  return { graph: graphCache.graph, source: graphCache.source };
 }
 
-function writeCache(graph: ArchitectureGraph) {
-  graphCache = { graph, at: Date.now() };
+function writeCache(graph: ArchitectureGraph, source: GraphSource) {
+  graphCache = { graph, source, at: Date.now() };
 }
 
 export function invalidateGraphCache() {
@@ -52,7 +63,7 @@ function toArchitectureGraph(
   };
 }
 
-export async function getGraph(): Promise<ArchitectureGraph> {
+export async function getGraph(): Promise<GraphLoadResult> {
   const cached = readCache();
   if (cached) return cached;
 
@@ -64,23 +75,23 @@ export async function getGraph(): Promise<ArchitectureGraph> {
 
     if (services.length === 0) {
       const graph = structuredClone(sampleGraph);
-      writeCache(graph);
+      writeCache(graph, "sample");
       void seedGraph(sampleGraph)
         .then(() => invalidateGraphCache())
         .catch((err) =>
           console.error("[getGraph] background seed failed:", err),
         );
-      return graph;
+      return { graph, source: "sample" };
     }
 
     const graph = toArchitectureGraph(services, dependencies);
-    writeCache(graph);
-    return graph;
+    writeCache(graph, "aurora");
+    return { graph, source: "aurora" };
   } catch (error) {
     console.error("[getGraph] Database error, using sample graph:", error);
     const graph = structuredClone(sampleGraph);
-    writeCache(graph);
-    return graph;
+    writeCache(graph, "sample");
+    return { graph, source: "sample" };
   }
 }
 
@@ -162,7 +173,7 @@ export async function addService(
     }
   });
 
-  return getGraph();
+  return (await getGraph()).graph;
 }
 
 export async function saveSimulationRun(

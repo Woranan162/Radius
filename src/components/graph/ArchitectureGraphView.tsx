@@ -19,6 +19,9 @@ import { computeSpofRankings } from "@/lib/simulation/spof";
 import { serviceById } from "@/lib/simulation/graph-utils";
 import { useIsDesktop } from "@/hooks/use-media-query";
 import type { SimulationResult } from "@/lib/simulation/types";
+import type { GraphSource } from "@/lib/store/graph-store";
+import { DataSourceBadge } from "./DataSourceBadge";
+import { AddServiceForm } from "./AddServiceForm";
 
 type SpofRow = {
   rank: number;
@@ -53,6 +56,8 @@ export function ArchitectureGraphView() {
   const [tab, setTab] = useState<"impact" | "recovery" | "spof">("impact");
   const [error, setError] = useState<string | null>(null);
   const [panelOpen, setPanelOpen] = useState(false);
+  const [dataSource, setDataSource] = useState<GraphSource | null>(null);
+  const [addFormOpen, setAddFormOpen] = useState(false);
 
   const architectureGraph = useMemo(
     () => responseToArchitectureGraph(graphData),
@@ -77,7 +82,9 @@ export function ArchitectureGraphView() {
       if (!res.ok) return;
       const data = (await res.json()) as Partial<GraphResponse>;
       setGraphData(normalizeGraphResponse(data));
+      if (data.source) setDataSource(data.source);
     } catch {
+      setDataSource("sample");
       /* Keep local sample graph */
     } finally {
       clearTimeout(timeout);
@@ -193,13 +200,15 @@ export function ArchitectureGraphView() {
           style={{ borderColor: "var(--border)" }}
         >
           <div className="min-w-0">
-            <p className="text-[11px] font-medium sm:text-[12px]" style={{ color: "var(--fg)" }}>
-              <span className="hidden sm:inline">Dependency graph · </span>
-              click a node to simulate failure
-            </p>
+            <div className="mb-1 flex flex-wrap items-center gap-2">
+              <DataSourceBadge source={dataSource} syncing={syncing} />
+              <p className="text-[11px] font-medium sm:text-[12px]" style={{ color: "var(--fg)" }}>
+                <span className="hidden sm:inline">Dependency graph · </span>
+                click a node to simulate failure
+              </p>
+            </div>
             <p className="hidden text-[11px] sm:block" style={{ color: "var(--fg-muted)" }}>
               {graphData.nodes.length} services · {graphData.edges.length} dependencies
-              {syncing && <span className="ml-1 opacity-70">· syncing…</span>}
             </p>
           </div>
           <div className="flex items-center gap-1">
@@ -219,6 +228,13 @@ export function ArchitectureGraphView() {
             )}
             <button
               type="button"
+              onClick={() => setAddFormOpen((v) => !v)}
+              className="btn-ghost text-[12px] !px-2 !py-1"
+            >
+              {addFormOpen ? "Close add" : "Add service"}
+            </button>
+            <button
+              type="button"
               onClick={onReset}
               disabled={loading}
               className="btn-ghost text-[12px] !px-2 !py-1"
@@ -227,6 +243,14 @@ export function ArchitectureGraphView() {
             </button>
           </div>
         </div>
+
+        {addFormOpen && (
+          <AddServiceForm
+            existingIds={graphData.nodes.map((n) => n.id)}
+            onAdded={syncFromServer}
+            onClose={() => setAddFormOpen(false)}
+          />
+        )}
 
         {error && (
           <p
@@ -252,7 +276,7 @@ export function ArchitectureGraphView() {
       {/* Results panel */}
       {showPanel && (
         <div
-          className="flex w-full shrink-0 flex-col overflow-hidden border-t lg:h-full lg:w-[min(380px,34vw)] lg:min-w-[300px] lg:border-l lg:border-t-0"
+          className="motion-panel-enter flex w-full shrink-0 flex-col overflow-hidden border-t lg:h-full lg:w-[min(380px,34vw)] lg:min-w-[300px] lg:border-l lg:border-t-0"
           style={{
             borderColor: "var(--border)",
             maxHeight: isDesktop ? undefined : "42dvh",

@@ -83,7 +83,7 @@ export function SimulationPanel({
             key={t.id}
             type="button"
             onClick={() => onTabChange(t.id)}
-            className="min-h-[36px] flex-1 rounded-md px-1.5 py-2 text-[11px] font-medium transition-colors sm:px-2 sm:text-[12px]"
+            className="min-h-[36px] flex-1 rounded-md px-1.5 py-2 text-[11px] font-medium transition-all duration-200 sm:px-2 sm:text-[12px]"
             style={{
               background: tab === t.id ? "white" : "transparent",
               color: tab === t.id ? "var(--fg)" : "var(--fg-muted)",
@@ -95,7 +95,7 @@ export function SimulationPanel({
         ))}
       </div>
 
-      <div className={`min-h-0 flex-1 overflow-y-auto ${pad} py-4`}>
+      <div key={tab} className={`motion-tab-content min-h-0 flex-1 overflow-y-auto ${pad} py-4`}>
         <TabExplanation
           tab={tab}
           open={tabHelpOpen[tab]}

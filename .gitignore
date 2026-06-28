@@ -18,6 +18,9 @@
 # production
 /build
 
+# cursor (local editor/agent config — do not commit)
+.cursor/
+
 # misc
 .DS_Store
 *.pem

@@ -1,3 +1,5 @@
+import { AnimateIn } from "@/components/ui/AnimateIn";
+
 const features = [
   {
     title: "Blast radius",
@@ -28,7 +30,8 @@ const features = [
 export function FeaturesSection() {
   return (
     <section className="mb-14 sm:mb-20">
-      <header className="mb-8 text-center sm:mb-10">
+      <AnimateIn>
+        <header className="mb-8 text-center sm:mb-10">
         <p
           className="mb-3 text-[11px] font-medium uppercase tracking-wide"
           style={{ color: "var(--fg-muted)" }}
@@ -49,12 +52,13 @@ export function FeaturesSection() {
           and SRE teams.
         </p>
       </header>
+      </AnimateIn>
 
       <div className="grid gap-4 sm:grid-cols-2 sm:gap-5">
-        {features.map((f) => (
+        {features.map((f, index) => (
+          <AnimateIn key={f.title} delay={index * 80}>
           <article
-            key={f.title}
-            className="group rounded-xl border p-5 transition-shadow sm:p-6"
+            className="motion-hover-lift group h-full rounded-xl border p-5 sm:p-6"
             style={{
               borderColor: "var(--border)",
               background: "#fff",
@@ -87,12 +91,13 @@ export function FeaturesSection() {
               {f.desc}
             </p>
           </article>
+          </AnimateIn>
         ))}
       </div>
 
-      {/* Example output card */}
+      <AnimateIn delay={120}>
       <div
-        className="mt-5 rounded-xl border p-5 sm:mt-6 sm:p-6"
+        className="motion-hover-lift mt-5 rounded-xl border p-5 sm:mt-6 sm:p-6"
         style={{
           borderColor: "var(--border-strong)",
           background:
@@ -146,6 +151,7 @@ export function FeaturesSection() {
           </div>
         </div>
       </div>
+      </AnimateIn>
     </section>
   );
 }

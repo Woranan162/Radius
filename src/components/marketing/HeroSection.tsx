@@ -23,7 +23,7 @@ export function HeroSection() {
         {/* Copy */}
         <div className="max-w-xl text-center lg:text-left">
           <p
-            className="mb-5 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium"
+            className="motion-enter mb-5 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium"
             style={{
               borderColor: "var(--border-strong)",
               color: "var(--fg-muted)",
@@ -31,14 +31,14 @@ export function HeroSection() {
             }}
           >
             <span
-              className="h-1.5 w-1.5 rounded-full"
+              className="motion-pulse-dot h-1.5 w-1.5 rounded-full"
               style={{ background: "var(--accent)" }}
             />
             For platform &amp; SRE teams
           </p>
 
           <h1
-            className="mb-4 text-[32px] font-bold leading-[1.12] tracking-tight sm:mb-5 sm:text-[40px] md:text-[48px] lg:text-[52px]"
+            className="motion-enter motion-enter-delay-1 mb-4 text-[32px] font-bold leading-[1.12] tracking-tight sm:mb-5 sm:text-[40px] md:text-[48px] lg:text-[52px]"
             style={{ color: "var(--fg)" }}
           >
             Know your blast radius{" "}
@@ -46,14 +46,14 @@ export function HeroSection() {
           </h1>
 
           <p
-            className="mx-auto mb-6 max-w-md text-base leading-relaxed sm:mb-8 sm:text-[17px] md:text-lg lg:mx-0"
+            className="motion-enter motion-enter-delay-2 mx-auto mb-6 max-w-md text-base leading-relaxed sm:mb-8 sm:text-[17px] md:text-lg lg:mx-0"
             style={{ color: "var(--fg-muted)" }}
           >
             Model service dependencies, simulate failures on an interactive graph,
             and get recovery plans with weighted impact scores.
           </p>
 
-          <div className="mb-6 flex flex-col gap-2 sm:mb-8 sm:flex-row sm:flex-wrap sm:items-center sm:justify-center sm:gap-3 lg:justify-start">
+          <div className="motion-enter motion-enter-delay-3 mb-6 flex flex-col gap-2 sm:mb-8 sm:flex-row sm:flex-wrap sm:items-center sm:justify-center sm:gap-3 lg:justify-start">
             <Link href="/graph" className="btn-primary w-full gap-2 px-5 py-2.5 sm:w-auto">
               Open simulator
               <ArrowIcon />
@@ -63,7 +63,7 @@ export function HeroSection() {
             </Link>
           </div>
 
-          <ul className="flex flex-wrap justify-center gap-2 lg:justify-start">
+          <ul className="motion-enter motion-enter-delay-4 motion-stagger flex flex-wrap justify-center gap-2 lg:justify-start">
             {highlights.map((item) => (
               <li
                 key={item}
@@ -81,7 +81,9 @@ export function HeroSection() {
         </div>
 
         {/* Preview card */}
+        <div className="motion-enter motion-enter-delay-2">
         <HeroPreview />
+        </div>
       </div>
     </section>
   );
@@ -90,7 +92,7 @@ export function HeroSection() {
 function HeroPreview() {
   return (
     <div
-      className="relative rounded-xl border shadow-[0_20px_50px_-12px_rgba(55,53,47,0.12)]"
+      className="motion-float relative rounded-xl border shadow-[0_20px_50px_-12px_rgba(55,53,47,0.12)]"
       style={{
         borderColor: "var(--border-strong)",
         background: "#fff",
@@ -184,9 +186,9 @@ function HeroGraphSvg() {
       aria-hidden
     >
       {/* edges */}
-      <path d="M170 52 L95 118" stroke={stroke} strokeWidth="1.5" />
-      <path d="M170 52 L245 118" stroke={stroke} strokeWidth="1.5" />
-      <path d="M95 118 L170 188" stroke={stroke} strokeWidth="1.5" />
+      <path className="motion-pulse-ring" d="M170 52 L95 118" stroke={stroke} strokeWidth="1.5" />
+      <path className="motion-pulse-ring" d="M170 52 L245 118" stroke={stroke} strokeWidth="1.5" />
+      <path className="motion-pulse-ring" d="M95 118 L170 188" stroke={stroke} strokeWidth="1.5" />
       <path d="M245 118 L170 188" stroke={stroke} strokeWidth="1.5" />
       <path d="M245 118 L280 188" stroke={stroke} strokeWidth="1.5" />
 

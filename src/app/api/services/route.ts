@@ -5,7 +5,7 @@ import { addService } from "@/lib/store/graph-store";
 
 /** Step 19 — GET /api/services */
 export async function GET() {
-  const graph = await getGraph();
+  const { graph } = await getGraph();
   return NextResponse.json({ services: graph.services });
 }
 

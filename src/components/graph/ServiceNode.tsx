@@ -17,7 +17,7 @@ function ServiceNodeComponent({ data }: NodeProps) {
 
   return (
     <div
-      className="service-node-card"
+      className={`service-node-card ${isFailed ? "service-node-card--failed" : isAffected ? "service-node-card--affected" : ""}`}
       style={{
         width: 150,
         minHeight: 58,

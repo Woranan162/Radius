@@ -15,7 +15,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const graph = await getGraph();
+    const { graph } = await getGraph();
     const result = runSimulation({ graph, failedIds });
 
     void saveSimulationRun(failedIds, result).catch((err) =>

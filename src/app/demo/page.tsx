@@ -1,7 +1,7 @@
 import { computeSpofRankings } from "@/lib/simulation/spof";
 import { runSimulation } from "@/lib/simulation/simulate";
 import { sampleGraph } from "@/lib/simulation/sample-graph";
-import { serviceById } from "@/lib/simulation/graph-utils";
+import { getGraph } from "@/lib/store/graph-store";
 import { MarketingNav } from "@/components/layout/MarketingNav";
 import { DemoPageView } from "@/components/demo/DemoPageView";
 
@@ -11,19 +11,20 @@ export default async function DemoPage({
   searchParams: Promise<{ fail?: string }>;
 }) {
   const params = await searchParams;
-  const failId =
-    sampleGraph.services.some((s) => s.id === params.fail)
-      ? (params.fail as string)
-      : "auth-service";
+  const { graph, source } = await getGraph();
+
+  const failId = graph.services.some((s) => s.id === params.fail)
+    ? (params.fail as string)
+    : graph.services[0]?.id ?? sampleGraph.services[0]!.id;
 
   const simulation = runSimulation({
-    graph: sampleGraph,
+    graph,
     failedIds: [failId],
   });
 
-  const spofRankings = computeSpofRankings(sampleGraph);
+  const spofRankings = computeSpofRankings(graph);
   const serviceNames = Object.fromEntries(
-    sampleGraph.services.map((s) => [s.id, s.name]),
+    graph.services.map((s) => [s.id, s.name]),
   );
 
   return (
@@ -31,7 +32,8 @@ export default async function DemoPage({
       <MarketingNav />
       <DemoPageView
         failId={failId}
-        graph={sampleGraph}
+        graph={graph}
+        dataSource={source}
         simulation={simulation}
         spofRankings={spofRankings}
         serviceNames={serviceNames}
