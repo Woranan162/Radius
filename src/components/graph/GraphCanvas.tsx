@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import {
   ReactFlow,
   ReactFlowProvider,
@@ -69,11 +69,16 @@ function GraphCanvasInner({
     [runFitView],
   );
 
+  const nodeSignature = useMemo(
+    () => nodesProp.map((n) => n.id).join(","),
+    [nodesProp],
+  );
+
   useEffect(() => {
     if (nodesInitialized) {
       runFitView();
     }
-  }, [nodesInitialized, runFitView]);
+  }, [nodesInitialized, nodeSignature, runFitView]);
 
   return (
     <ReactFlow

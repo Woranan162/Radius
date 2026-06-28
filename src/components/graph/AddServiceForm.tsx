@@ -5,7 +5,7 @@ import type { ServiceTier } from "@/lib/simulation/types";
 
 type Props = {
   existingIds: string[];
-  onAdded: () => Promise<void>;
+  onAdded: (serviceName: string) => Promise<void>;
   onClose: () => void;
 };
 
@@ -45,8 +45,7 @@ export function AddServiceForm({ existingIds, onAdded, onClose }: Props) {
         throw new Error(data.error ?? "Failed to add service");
       }
 
-      await onAdded();
-      onClose();
+      await onAdded(name.trim());
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to add service");
     } finally {

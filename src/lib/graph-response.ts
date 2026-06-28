@@ -18,12 +18,13 @@ export type GraphResponse = {
 export function architectureGraphToResponse(
   graph: ArchitectureGraph,
 ): GraphResponse {
-  const nodes = graph.services.map((service, index) => ({
+  const serviceIds = graph.services.map((s) => s.id);
+  const nodes = graph.services.map((service) => ({
     id: service.id,
     name: service.name,
     tier: service.tier,
     weight: service.weight,
-    position: layoutForService(service.id, index),
+    position: layoutForService(service.id, serviceIds),
   }));
 
   const edges = graph.dependencies.map((dep, i) => ({

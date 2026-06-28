@@ -7,14 +7,18 @@ export const graphLayout: Record<string, { x: number; y: number }> = {
   "redis-cache": { x: 250, y: 400 },
 };
 
+/** Place custom services in a visible column to the right of the seed graph */
 export function layoutForService(
   id: string,
-  index: number,
+  allServiceIds: string[],
 ): { x: number; y: number } {
-  return (
-    graphLayout[id] ?? {
-      x: 100 + (index % 3) * 220,
-      y: 100 + Math.floor(index / 3) * 160,
-    }
-  );
+  if (graphLayout[id]) return graphLayout[id];
+
+  const customIds = allServiceIds.filter((sid) => !graphLayout[sid]);
+  const customIndex = Math.max(0, customIds.indexOf(id));
+
+  return {
+    x: 620,
+    y: 40 + customIndex * 110,
+  };
 }

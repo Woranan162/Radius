@@ -58,6 +58,7 @@ export function ArchitectureGraphView() {
   const [panelOpen, setPanelOpen] = useState(false);
   const [dataSource, setDataSource] = useState<GraphSource | null>(null);
   const [addFormOpen, setAddFormOpen] = useState(false);
+  const [addedMessage, setAddedMessage] = useState<string | null>(null);
 
   const architectureGraph = useMemo(
     () => responseToArchitectureGraph(graphData),
@@ -78,7 +79,10 @@ export function ArchitectureGraphView() {
     const timeout = setTimeout(() => controller.abort(), 8000);
 
     try {
-      const res = await fetch("/api/graph", { signal: controller.signal });
+      const res = await fetch(`/api/graph?_=${Date.now()}`, {
+        signal: controller.signal,
+        cache: "no-store",
+      });
       if (!res.ok) return;
       const data = (await res.json()) as Partial<GraphResponse>;
       setGraphData(normalizeGraphResponse(data));
@@ -170,6 +174,43 @@ export function ArchitectureGraphView() {
     [architectureGraph, isDesktop],
   );
 
+  const onDeleteSelected = useCallback(async () => {
+    if (!failedId) return;
+
+    const name = serviceNames[failedId] ?? failedId;
+    if (
+      !window.confirm(
+        `Remove "${name}" from the architecture?\n\nConnected dependencies are removed and SPOF rankings recalculate automatically.`,
+      )
+    ) {
+      return;
+    }
+
+    setError(null);
+    setLoading(true);
+
+    try {
+      const res = await fetch(`/api/services/${encodeURIComponent(failedId)}`, {
+        method: "DELETE",
+      });
+      const data = (await res.json()) as { error?: string };
+      if (!res.ok) {
+        throw new Error(data.error ?? "Delete failed");
+      }
+
+      setFailedId(null);
+      setSimulation(null);
+      setTab("spof");
+      await syncFromServer();
+      setAddedMessage(`${name} removed — graph and rankings recalculated`);
+      window.setTimeout(() => setAddedMessage(null), 5000);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Delete failed");
+    } finally {
+      setLoading(false);
+    }
+  }, [failedId, serviceNames, syncFromServer]);
+
   const onReset = useCallback(async () => {
     setError(null);
     setLoading(true);
@@ -235,6 +276,19 @@ export function ArchitectureGraphView() {
             </button>
             <button
               type="button"
+              onClick={() => void onDeleteSelected()}
+              disabled={loading || !failedId}
+              className="btn-ghost text-[12px] !px-2 !py-1 disabled:opacity-40"
+              title={
+                failedId
+                  ? `Remove ${serviceNames[failedId] ?? failedId}`
+                  : "Click a node first"
+              }
+            >
+              Delete node
+            </button>
+            <button
+              type="button"
               onClick={onReset}
               disabled={loading}
               className="btn-ghost text-[12px] !px-2 !py-1"
@@ -247,9 +301,27 @@ export function ArchitectureGraphView() {
         {addFormOpen && (
           <AddServiceForm
             existingIds={graphData.nodes.map((n) => n.id)}
-            onAdded={syncFromServer}
+            onAdded={async (serviceName) => {
+              await syncFromServer();
+              setAddedMessage(`${serviceName} added — check the right side of the graph`);
+              setAddFormOpen(false);
+              window.setTimeout(() => setAddedMessage(null), 5000);
+            }}
             onClose={() => setAddFormOpen(false)}
           />
+        )}
+
+        {addedMessage && (
+          <p
+            className="shrink-0 border-b px-3 py-2 text-[12px] sm:px-4"
+            style={{
+              borderColor: "var(--border)",
+              color: "#1d6b3a",
+              background: "#e8f5ec",
+            }}
+          >
+            {addedMessage}
+          </p>
         )}
 
         {error && (

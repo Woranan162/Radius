@@ -173,6 +173,24 @@ export async function addService(
     }
   });
 
+  invalidateGraphCache();
+  return (await getGraph()).graph;
+}
+
+export async function deleteService(id: string): Promise<ArchitectureGraph> {
+  const existing = await prisma.service.findUnique({ where: { id } });
+  if (!existing) {
+    throw new Error(`Service not found: ${id}`);
+  }
+
+  const count = await prisma.service.count();
+  if (count <= 1) {
+    throw new Error("Cannot delete the last service in the architecture");
+  }
+
+  await prisma.service.delete({ where: { id } });
+
+  invalidateGraphCache();
   return (await getGraph()).graph;
 }
 
