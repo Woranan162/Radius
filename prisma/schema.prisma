@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// One service in the architecture graph (e.g. auth-service)
+model Service {
+  id             String @id
+  name           String
+  tier           String
+  weight         Int
+  restoreTimeMin Int    @map("restore_time_min")
+  restoreCost    Int    @map("restore_cost")
+
+  dependents   Dependency[] @relation("DependentService")
+  dependencies Dependency[] @relation("DependencyService")
+
+  @@map("services")
+}
+
+/// `dependentId` depends on `dependencyId`
+model Dependency {
+  id           String @id @default(cuid())
+  dependentId  String @map("dependent_id")
+  dependencyId String @map("dependency_id")
+
+  dependent  Service @relation("DependentService", fields: [dependentId], references: [id], onDelete: Cascade)
+  dependency Service @relation("DependencyService", fields: [dependencyId], references: [id], onDelete: Cascade)
+
+  @@unique([dependentId, dependencyId])
+  @@map("dependencies")
+}
+
+/// Saved simulation runs (audit / history)
+model SimulationRun {
+  id         String   @id @default(cuid())
+  failedIds  String[] @map("failed_ids")
+  resultJson Json     @map("result_json")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@map("simulation_runs")
+}

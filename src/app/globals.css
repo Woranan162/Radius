@@ -1,0 +1,184 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Notion-inspired tokens */
+:root {
+  --bg: #ffffff;
+  --bg-secondary: #f7f6f3;
+  --fg: #37352f;
+  --fg-muted: #787774;
+  --border: rgba(55, 53, 47, 0.09);
+  --border-strong: rgba(55, 53, 47, 0.16);
+  --hover: rgba(55, 53, 47, 0.06);
+  --accent: #2383e2;
+  --danger: #eb5757;
+  --warning: #d9730d;
+}
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply antialiased;
+    color: var(--fg);
+    background: var(--bg);
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow-x: hidden;
+  }
+}
+
+@layer utilities {
+  .pt-safe {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .h-screen-safe {
+    height: 100vh;
+    height: 100dvh;
+  }
+}
+
+@layer components {
+  .notion-panel {
+    @apply rounded-md border bg-white;
+    border-color: var(--border);
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-white transition-colors;
+    background: var(--fg);
+    min-height: 40px;
+  }
+
+  .btn-primary:hover {
+    background: #2f2e2b;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors;
+    color: var(--fg-muted);
+    min-height: 40px;
+  }
+
+  .btn-ghost:hover {
+    background: var(--hover);
+    color: var(--fg);
+  }
+
+  .page-container {
+    @apply mx-auto w-full max-w-[900px] px-4 sm:px-6 md:px-8;
+  }
+
+  .page-container-wide {
+    @apply mx-auto w-full max-w-[1100px] px-4 sm:px-6 md:px-8;
+  }
+
+  .workspace-shell {
+    @apply flex min-h-0 flex-1 flex-col;
+  }
+
+  .notion-nav-link {
+    @apply rounded-md px-2.5 py-1.5 text-sm transition-colors;
+    color: var(--fg-muted);
+  }
+
+  .notion-nav-link:hover {
+    background: var(--hover);
+    color: var(--fg);
+  }
+}
+
+.graph-canvas-host {
+  position: relative;
+  width: 100%;
+  height: calc(100dvh - 3rem - 2.5rem);
+  min-height: 360px;
+  background: var(--bg-secondary);
+}
+
+@media (min-width: 640px) {
+  .graph-canvas-host {
+    height: calc(100dvh - 2.8125rem - 2.5rem);
+  }
+}
+
+.react-flow {
+  background: var(--bg-secondary) !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.react-flow__viewport,
+.react-flow__renderer {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.react-flow__node {
+  visibility: visible !important;
+}
+
+.react-flow__handle {
+  width: 7px !important;
+  height: 7px !important;
+  background: #787774 !important;
+  border: none !important;
+}
+
+.react-flow__controls {
+  border: 1px solid var(--border) !important;
+  border-radius: 6px !important;
+  background: white !important;
+  box-shadow: 0 2px 8px rgba(55, 53, 47, 0.1) !important;
+  z-index: 10 !important;
+}
+
+@media (min-width: 1024px) {
+  .graph-canvas-host .graph-zoom-controls {
+    top: 12px !important;
+    left: 12px !important;
+    bottom: auto !important;
+  }
+}
+
+@media (max-width: 1023px) {
+  .react-flow__controls {
+    transform: scale(0.9);
+    transform-origin: bottom left;
+    bottom: 12px !important;
+    left: 12px !important;
+  }
+
+  .react-flow__minimap {
+    display: none !important;
+  }
+}
+
+.react-flow__controls-button {
+  border-color: var(--border) !important;
+  background: white !important;
+  color: var(--fg-muted) !important;
+}
+
+.react-flow__controls-button:hover {
+  background: var(--hover) !important;
+}
+
+.react-flow__minimap {
+  border: 1px solid var(--border) !important;
+  border-radius: 6px !important;
+  background: white !important;
+  box-shadow: none !important;
+}
+
+.react-flow__attribution {
+  @apply hidden;
+}

@@ -1,0 +1,17 @@
+# Radius — local Postgres (matches Aurora PostgreSQL engine)
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: blastradius-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: blastradius
+      POSTGRES_PASSWORD: blastradius
+      POSTGRES_DB: blastradius
+    volumes:
+      - blastradius_pg_data:/var/lib/postgresql/data
+
+volumes:
+  blastradius_pg_data:
