@@ -194,6 +194,41 @@ export async function deleteService(id: string): Promise<ArchitectureGraph> {
   return (await getGraph()).graph;
 }
 
+export async function addDependency(
+  dependentId: string,
+  dependencyId: string,
+): Promise<ArchitectureGraph> {
+  if (dependentId === dependencyId) {
+    throw new Error("A service cannot depend on itself");
+  }
+
+  const [dependent, dependency] = await Promise.all([
+    prisma.service.findUnique({ where: { id: dependentId } }),
+    prisma.service.findUnique({ where: { id: dependencyId } }),
+  ]);
+
+  if (!dependent) {
+    throw new Error(`Unknown service: ${dependentId}`);
+  }
+  if (!dependency) {
+    throw new Error(`Unknown service: ${dependencyId}`);
+  }
+
+  const existing = await prisma.dependency.findFirst({
+    where: { dependentId, dependencyId },
+  });
+  if (existing) {
+    throw new Error("Dependency already exists");
+  }
+
+  await prisma.dependency.create({
+    data: { dependentId, dependencyId },
+  });
+
+  invalidateGraphCache();
+  return (await getGraph()).graph;
+}
+
 export async function saveSimulationRun(
   failedIds: string[],
   resultJson: object,

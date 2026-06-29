@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import type { Node, Edge, NodeTypes } from "@xyflow/react";
+import type { Node, Edge, NodeTypes, Connection } from "@xyflow/react";
 
 import ServiceNodeComponent, {
   type ServiceNodeData,
@@ -46,6 +46,22 @@ function normalizeGraphResponse(data: Partial<GraphResponse>): GraphResponse {
   };
 }
 
+function mergeNodePositions(
+  incoming: GraphResponse,
+  previous: GraphResponse,
+): GraphResponse {
+  const posById = Object.fromEntries(
+    previous.nodes.map((n) => [n.id, n.position]),
+  );
+  return {
+    ...incoming,
+    nodes: incoming.nodes.map((n) => ({
+      ...n,
+      position: posById[n.id] ?? n.position,
+    })),
+  };
+}
+
 export function ArchitectureGraphView() {
   const isDesktop = useIsDesktop();
   const [graphData, setGraphData] = useState<GraphResponse>(INITIAL_GRAPH);
@@ -85,7 +101,9 @@ export function ArchitectureGraphView() {
       });
       if (!res.ok) return;
       const data = (await res.json()) as Partial<GraphResponse>;
-      setGraphData(normalizeGraphResponse(data));
+      setGraphData((prev) =>
+        mergeNodePositions(normalizeGraphResponse(data), prev),
+      );
       if (data.source) setDataSource(data.source);
     } catch {
       setDataSource("sample");
@@ -211,6 +229,70 @@ export function ArchitectureGraphView() {
     }
   }, [failedId, serviceNames, syncFromServer]);
 
+  const onNodeDragStop = useCallback((_: unknown, node: Node) => {
+    setGraphData((prev) => ({
+      ...prev,
+      nodes: prev.nodes.map((n) =>
+        n.id === node.id ? { ...n, position: { ...node.position } } : n,
+      ),
+    }));
+  }, []);
+
+  const onConnect = useCallback(
+    async (connection: Connection) => {
+      const { source, target } = connection;
+      if (!source || !target) return;
+
+      setError(null);
+      setLoading(true);
+
+      try {
+        const res = await fetch("/api/dependencies", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ from: source, to: target }),
+        });
+        const data = (await res.json()) as { error?: string };
+        if (!res.ok) {
+          throw new Error(data.error ?? "Failed to create dependency");
+        }
+
+        const graphRes = await fetch(`/api/graph?_=${Date.now()}`, {
+          cache: "no-store",
+        });
+        if (graphRes.ok) {
+          const graphJson = (await graphRes.json()) as Partial<GraphResponse>;
+          setGraphData((prev) => {
+            const merged = mergeNodePositions(
+              normalizeGraphResponse(graphJson),
+              prev,
+            );
+            const graph = responseToArchitectureGraph(merged);
+            if (failedId) {
+              setSimulation(runSimulation({ graph, failedIds: [failedId] }));
+              setTab("impact");
+            } else {
+              setTab("spof");
+            }
+            return merged;
+          });
+        }
+
+        const fromName = serviceNames[source] ?? source;
+        const toName = serviceNames[target] ?? target;
+        setAddedMessage(
+          `${fromName} now depends on ${toName} — graph recalculated`,
+        );
+        window.setTimeout(() => setAddedMessage(null), 5000);
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Failed to connect nodes");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [failedId, serviceNames],
+  );
+
   const onReset = useCallback(async () => {
     setError(null);
     setLoading(true);
@@ -245,11 +327,12 @@ export function ArchitectureGraphView() {
               <DataSourceBadge source={dataSource} syncing={syncing} />
               <p className="text-[11px] font-medium sm:text-[12px]" style={{ color: "var(--fg)" }}>
                 <span className="hidden sm:inline">Dependency graph · </span>
-                click a node to simulate failure
+                drag · connect · click to simulate
               </p>
             </div>
             <p className="hidden text-[11px] sm:block" style={{ color: "var(--fg-muted)" }}>
               {graphData.nodes.length} services · {graphData.edges.length} dependencies
+              <span className="ml-1 opacity-80">· connect bottom handle → top handle</span>
             </p>
           </div>
           <div className="flex items-center gap-1">
@@ -339,6 +422,8 @@ export function ArchitectureGraphView() {
             edges={flowEdges}
             nodeTypes={nodeTypes}
             onNodeClick={onNodeClick}
+            onNodeDragStop={onNodeDragStop}
+            onConnect={(c) => void onConnect(c)}
             showMinimap={isDesktop}
             isDesktop={isDesktop}
           />

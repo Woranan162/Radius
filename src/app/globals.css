@@ -417,10 +417,20 @@
 }
 
 .react-flow__handle {
-  width: 7px !important;
-  height: 7px !important;
+  width: 9px !important;
+  height: 9px !important;
   background: #787774 !important;
-  border: none !important;
+  border: 2px solid #fff !important;
+  opacity: 0.85;
+}
+
+.react-flow__handle:hover {
+  background: var(--accent) !important;
+  opacity: 1;
+}
+
+.react-flow__node.selected .service-node-card {
+  box-shadow: 0 0 0 2px rgba(35, 131, 226, 0.35);
 }
 
 .react-flow__controls {

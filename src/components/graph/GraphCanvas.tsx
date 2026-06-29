@@ -16,6 +16,7 @@ import {
   type Edge,
   type NodeTypes,
   type ReactFlowInstance,
+  type Connection,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 
@@ -26,6 +27,8 @@ type GraphCanvasProps = {
   edges: Edge[];
   nodeTypes: NodeTypes;
   onNodeClick: (event: unknown, node: Node) => void;
+  onNodeDragStop?: (event: unknown, node: Node) => void;
+  onConnect?: (connection: Connection) => void;
   showMinimap?: boolean;
   isDesktop?: boolean;
 };
@@ -35,6 +38,8 @@ function GraphCanvasInner({
   edges: edgesProp,
   nodeTypes,
   onNodeClick,
+  onNodeDragStop,
+  onConnect,
   showMinimap,
   isDesktop,
 }: GraphCanvasProps) {
@@ -88,10 +93,13 @@ function GraphCanvasInner({
       onEdgesChange={onEdgesChange}
       nodeTypes={nodeTypes}
       onNodeClick={onNodeClick}
+      onNodeDragStop={onNodeDragStop}
+      onConnect={onConnect}
       onInit={onInit}
-      nodesDraggable={false}
-      nodesConnectable={false}
+      nodesDraggable
+      nodesConnectable
       elementsSelectable
+      connectOnClick={false}
       minZoom={0.2}
       maxZoom={2}
       panOnScroll={isDesktop}
